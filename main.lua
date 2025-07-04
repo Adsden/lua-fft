@@ -12,9 +12,6 @@ local soundData ---@type love.SoundData
 local decoder ---@type love.Decoder
 local fft, comp_time_fft
 local source ---@type love.Source
-local comp_time_update
-local comp_time_decode
-local delta_time
 
 function love.load()
     -- local file = [[sin440Hz_44100Hz_1024samples.wav]]
@@ -29,30 +26,24 @@ function love.load()
 end
 
 function love.update(dt)
-    delta_time = dt
     local start_time = socket.gettime()
     local d = decoder:clone()
     d:seek(source:tell("seconds"))
     soundData = d:decode()
-    comp_time_decode = socket.gettime() - start_time
 
     fft, comp_time_fft = naive_dft(soundData)
     -- source = love.audio.newSource(soundData)
     -- source:play()
-    comp_time_update = socket.gettime() - start_time
 end
 
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     -- Info
-    love.graphics.print(
-        string.format("%d samples @ %dHz", soundData:getSampleCount(), soundData:getSampleRate()))
-    love.graphics.print(string.format("%d x %d", love.graphics.getDimensions()), 0, 13 * 1)
-    love.graphics.print(string.format("%d x %d", love.mouse.getPosition()), 0, 13 * 2)
-    love.graphics.print(string.format("DFT computation time (naive): %f (%06.03f ms)", comp_time_fft, comp_time_fft * 1000), 0, 13 * 3)
-    love.graphics.print(string.format("SoundData decode time: %f (%06.03f ms)", comp_time_decode, comp_time_decode * 1000), 0, 13 * 6)
-    love.graphics.print(string.format("Decode + DFT computation time: %f (%06.03f ms)", comp_time_update, comp_time_update * 1000), 0, 13 * 4)
-    love.graphics.print(string.format("Delta time: %f (%06.03f ms)", delta_time, delta_time * 1000), 0, 13 * 5)
+    DEBUG_PRINT_LINE = 0
+    love.graphics.debugf("%d samples @ %dHz", soundData:getSampleCount(), soundData:getSampleRate())
+    love.graphics.debugf("Window resolution: %d x %d", love.graphics.getDimensions())
+    love.graphics.debugf("Mouse position: %d x %d", love.mouse.getPosition())
+    love.graphics.debugf("DFT computation time (naive): %f (%06.03f ms)", comp_time_fft, comp_time_fft * 1000)
 
     -- time domain plot
     local points = {}
@@ -96,4 +87,10 @@ function naive_dft(x)
     end
 
     return X, socket.gettime() - time_start
+end
+
+DEBUG_PRINT_LINE = 0
+function love.graphics.debugf(fmt, ...)
+    love.graphics.print(string.format(fmt, ...), 0, 13 * DEBUG_PRINT_LINE)
+    DEBUG_PRINT_LINE = DEBUG_PRINT_LINE + 1
 end
