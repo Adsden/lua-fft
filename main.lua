@@ -12,7 +12,6 @@
 ]]
 
 local complex = require "complex"
-local socket = require "socket"
 local fft = require "fft"
 
 -- Attach debugger if necessary
@@ -41,7 +40,6 @@ function love.load()
 end
 
 function love.update(dt)
-    local start_time = socket.gettime()
     local d = decoder:clone()
     d:seek(source:tell("seconds"))
     soundData = d:decode()
