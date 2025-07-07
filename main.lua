@@ -55,10 +55,10 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
     -- Info
     DEBUG_PRINT_LINE = 0
-    love.graphics.debugf("%d samples @ %dHz", soundData:getSampleCount(), soundData:getSampleRate())
-    love.graphics.debugf("Window resolution: %d x %d", love.graphics.getDimensions())
-    love.graphics.debugf("Mouse position: %d x %d", love.mouse.getPosition())
-    love.graphics.debugf("DFT computation time (naive): %f (%06.03f ms)", comp_time_fft, comp_time_fft * 1000)
+    debug("%d samples @ %dHz", soundData:getSampleCount(), soundData:getSampleRate())
+    debug("Window resolution: %d x %d", love.graphics.getDimensions())
+    debug("Mouse position: %d x %d", love.mouse.getPosition())
+    debug("DFT computation time (naive): %f (%06.03f ms)", comp_time_fft, comp_time_fft * 1000)
 
     -- time domain plot
     local points = {}
@@ -87,7 +87,7 @@ function love.draw()
 end
 
 DEBUG_PRINT_LINE = 0
-function love.graphics.debugf(fmt, ...)
+function debug(fmt, ...)
     love.graphics.print(string.format(fmt, ...), 0, 13 * DEBUG_PRINT_LINE)
     DEBUG_PRINT_LINE = DEBUG_PRINT_LINE + 1
 end
