@@ -1,5 +1,19 @@
+--[[
+
+    TODO:
+
+    - Handle L/R channels being interleaved in sound data
+    - Implement FFT rather than the naive DFT
+    - Look into embedding complex number calculations rather than using a
+      complex number module
+    - Experiment with recording device samples (microphone)
+    - Add windowing functions (perhaps a table/module of various functions)
+    - Clean up code
+]]
+
 local complex = require "complex"
 local socket = require "socket"
+local fft = require "fft"
 
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
@@ -10,19 +24,20 @@ end
 
 local soundData ---@type love.SoundData
 local decoder ---@type love.Decoder
-local fft, comp_time_fft
+local fft_data, comp_time_fft
 local source ---@type love.Source
 
 function love.load()
     -- local file = [[sin440Hz_44100Hz_1024samples.wav]]
     local file = [[untitled.wav]]
     -- soundData = love.sound.newSoundData(file)
-    decoder = love.sound.newDecoder("song.mp3", 4096)
-    soundData = decoder:decode()
+    decoder = love.sound.newDecoder("song1.mp3", 4096)
     source = love.audio.newSource(decoder, "stream")
     source:play()
+    -- initial data
+    soundData = decoder:decode()
 
-    fft, comp_time_fft = naive_dft(soundData)
+    fft_data, comp_time_fft = fft.naive_dft(soundData)
 end
 
 function love.update(dt)
@@ -31,7 +46,7 @@ function love.update(dt)
     d:seek(source:tell("seconds"))
     soundData = d:decode()
 
-    fft, comp_time_fft = naive_dft(soundData)
+    fft_data, comp_time_fft = fft.naive_dft(soundData)
     -- source = love.audio.newSource(soundData)
     -- source:play()
 end
@@ -53,40 +68,22 @@ function love.draw()
         table.insert(points, centre_y - soundData:getSample(i) * 100)
     end
     love.graphics.setColor(0, 0.5, 1)
-    love.graphics.line(points)
+    love.graphics.points(points)
 
     -- frequency domain plot
     local points = {}
+    local points2 = {}
     for i = 0, love.graphics.getWidth() do
         table.insert(points, i)
-        local re, im = complex.get(fft[i])
+        table.insert(points2, i)
+        local re, im = complex.get(fft_data[i])
         local magnitude = math.sqrt(re ^ 2 + im ^ 2)
         table.insert(points, centre_y - magnitude)
+        table.insert(points2, centre_y + magnitude)
     end
     love.graphics.setColor(0, 1, 0)
     love.graphics.line(points)
-end
-
----@param x love.SoundData
-function naive_dft(x)
-    local time_start = socket.gettime()
-    local X = {} -- X[k] Complex frequency spectrum
-    local N = x:getSampleCount()
-
-    -- 2pi/N * -i
-    local W = complex.new(0, -1) * ((2 * math.pi) / N)
-
-    -- k: frequency index X[k]
-    for k = 0, N - 1 do
-        local sum = complex.to(0)
-        for n = 0, N - 1 do
-            sum = sum + (x:getSample(n) * complex.exp(W * k * n))
-        end
-
-        X[k] = sum
-    end
-
-    return X, socket.gettime() - time_start
+    love.graphics.line(points2)
 end
 
 DEBUG_PRINT_LINE = 0
