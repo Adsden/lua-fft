@@ -41,7 +41,7 @@ function love.update(dt)
 
     -- get sound data at current pos and compute fft
     soundData = d:decode()
-    fft_data, comp_time_fft = fft.naive_dft(soundData)
+    fft_data, comp_time_fft = fft.ditfft2(soundData)
 end
 
 function love.draw()
@@ -52,6 +52,7 @@ function love.draw()
     debug("Window resolution: %d x %d", love.graphics.getDimensions())
     debug("Mouse position: %d x %d", love.mouse.getPosition())
     debug("DFT computation time (naive): %f (%06.03f ms)", comp_time_fft, comp_time_fft * 1000)
+    debug("%d", #fft_data)
 
     -- time domain plot
     local points = {}
