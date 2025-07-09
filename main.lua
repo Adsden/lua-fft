@@ -12,27 +12,26 @@
 ]]
 
 local complex = require "complex"
-local fft = require "fft"
+local fft = require "fft2"
 
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
     require("lldebugger").start()
 end
 
--- Locals
 
 local decoder ---@type love.Decoder
 local source ---@type love.Source
-local soundData ---@type love.SoundData
-local fft_data, comp_time_fft
-
 function love.load()
     -- create sound decoder and source
-    decoder = love.sound.newDecoder("song1.mp3", 4096)
+    -- decoder = love.sound.newDecoder("song1.mp3", 4096)
+    decoder = love.sound.newDecoder("song1_mono.wav", 4096 / 2)
     source = love.audio.newSource(decoder, "stream")
     source:play()
 end
 
+local soundData ---@type love.SoundData
+local fft_data, comp_time_fft
 function love.update(dt)
     -- Clone decoder and seek to current audio position
     -- new decoder will have pos=0 which allows seeking to source's exact position
@@ -66,8 +65,9 @@ function love.draw()
 
     -- frequency domain plot
     points = {}
-    for i = 0, love.graphics.getWidth() do
-        table.insert(points, i)
+    for i = 0, (#fft_data + 1) / 2 do
+        -- table.insert(points, math.log10(i) * (1024 / math.log10((#fft_data + 1) / 2)))
+        table.insert(points, i * 2)
         local re, im = complex.get(fft_data[i])
         local magnitude = math.sqrt(re ^ 2 + im ^ 2)
         table.insert(points, centre_y - magnitude)
