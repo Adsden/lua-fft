@@ -12,7 +12,7 @@
 ]]
 
 local complex = require "complex"
-local fft = require "fft2"
+local FFT = require "fft2"
 
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
@@ -31,7 +31,8 @@ function love.load()
 end
 
 local soundData ---@type love.SoundData
-local fft_data, comp_time_fft
+local fft_data
+local fft_benchmark
 function love.update(dt)
     -- Clone decoder and seek to current audio position
     -- new decoder will have pos=0 which allows seeking to source's exact position
@@ -40,7 +41,9 @@ function love.update(dt)
 
     -- get sound data at current pos and compute fft
     soundData = d:decode()
-    fft_data, comp_time_fft = fft.ditfft2(soundData)
+    local time_start = os.clock()
+    fft_data = FFT.ditfft2(soundData)
+    fft_benchmark = os.clock() - time_start
 end
 
 function love.draw()
@@ -50,8 +53,7 @@ function love.draw()
     debug("%d samples @ %dHz", soundData:getSampleCount(), soundData:getSampleRate())
     debug("Window resolution: %d x %d", love.graphics.getDimensions())
     debug("Mouse position: %d x %d", love.mouse.getPosition())
-    debug("DFT computation time (naive): %f (%06.03f ms)", comp_time_fft, comp_time_fft * 1000)
-    debug("%d", #fft_data)
+    debug("FFT computation time: %f (%06.03f ms)", fft_benchmark, fft_benchmark * 1000)
 
     -- time domain plot
     local points = {}

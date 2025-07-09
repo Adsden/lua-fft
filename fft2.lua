@@ -15,17 +15,30 @@ local function ditfft2(data, N, s)
     N = N or #data + 1
     s = s or 1
 
+    -- Trivial size-1 DFT base case
+    -- The DFT of a single sample is itself
     if (N == 1) then
         return { [0] = data[0] }
     end
 
+    -- Recursively compute DFTs of even and odd "halves"
     local dft_even = ditfft2(data, N / 2, 2 * s)
     local dft_odd = ditfft2(table.move(data, s, #data, 0, {}), N / 2, 2 * s)
 
+    -- Create cache for twiddle values used in merging the DFTS
+    local twiddle_cache = {}
+    local function get_twiddle(k)
+        if twiddle_cache[k] then return twiddle_cache[k] end
+        twiddle_cache[k] = complex.exp((-2 * math.pi * complex.new(0, 1) * k) / N)
+        return twiddle_cache[k]
+    end
+
+    -- Merge even and odd DFTs into one
     local dft_merged = {}
     for k = 0, (N / 2) - 1 do
-        p = dft_even[k]
-        q = complex.exp((-2 * math.pi * complex.new(0, 1) * k) / N) * dft_odd[k]
+        local p = dft_even[k]
+        -- local q = complex.exp((-2 * math.pi * complex.new(0, 1) * k) / N) * dft_odd[k]
+        local q = get_twiddle(k) * dft_odd[k]
 
         dft_merged[k] = p + q
         dft_merged[k + (N / 2)] = p - q
@@ -36,8 +49,7 @@ end
 
 -- wrapper function for love.SoundData
 function FFT.ditfft2(soundData)
-    local time_start = os.clock()
-    return ditfft2(tolist(soundData)), os.clock() - time_start
+    return ditfft2(tolist(soundData), nil, nil)
 end
 
 return FFT
