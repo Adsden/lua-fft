@@ -20,4 +20,10 @@ function window.hamming(n, frameSize)
     return 0.54 - 0.46 * cos((2 * pi * n) / (frameSize - 1));
 end
 
+---@type windowFunction
+function window.blackmann_harris(n, frameSize)
+    return 0.35875 - (0.48829 * cos((2 * pi * n) / (frameSize - 1))) +
+        (0.14128 * cos((4 * pi * n) / (frameSize - 1))) - (0.01168 * cos((6 * pi * n) / (frameSize - 1)));
+end
+
 return window
