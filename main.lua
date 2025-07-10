@@ -16,7 +16,7 @@ local FFT = require "fft"
     - [ ] Look into embedding complex number calculations rather than using a
           complex number module
     - [ ] Experiment with recording device samples (microphone)
-    - [ ] Add windowing functions (perhaps a table/module of various functions)
+    - [x] Add windowing functions (perhaps a table/module of various functions)
     - [ ] Clean up code
 ]]
 
