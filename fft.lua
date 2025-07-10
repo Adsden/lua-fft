@@ -1,12 +1,14 @@
 local complex = require "complex"
+local windows = require "windows"
 local FFT = {}
 
 ---Converts love.SoundData objects to a 0-indexed lists of complex numbers
 ---@param soundData love.SoundData
-local function tolist(soundData)
+local function tolist(soundData, window)
     local list = {}
-    for i = 0, soundData:getSampleCount() - 1 do
-        list[i] = complex.to(soundData:getSample(i))
+    local N = soundData:getSampleCount()
+    for i = 0, N - 1 do
+        list[i] = complex.to(soundData:getSample(i) * window(i, N))
     end
     return list
 end
@@ -48,8 +50,9 @@ local function ditfft2(data, N, s)
 end
 
 -- wrapper function for love.SoundData
-function FFT.ditfft2(soundData)
-    return ditfft2(tolist(soundData), nil, nil)
+function FFT.ditfft2(soundData, window)
+    window = window or windows.hann
+    return ditfft2(tolist(soundData, window))
 end
 
 ---Computes the naive DFT. Not a fast fourier transform, and not optimised:
