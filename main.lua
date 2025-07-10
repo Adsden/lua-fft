@@ -1,3 +1,4 @@
+local window = require "windows"
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
     require("lldebugger").start()
@@ -23,7 +24,7 @@ local decoder ---@type love.Decoder
 local source ---@type love.Source
 function love.load()
     -- create sound decoder and source
-    decoder = love.sound.newDecoder("audio/7_tones.wav", 4096)
+    decoder = love.sound.newDecoder("audio/who.wav", 4096)
     -- decoder = love.sound.newDecoder("song1_mono.wav", 4096 / 2)
     source = love.audio.newSource(decoder, "stream")
     source:play()
@@ -34,14 +35,12 @@ local fft_data
 local fft_benchmark
 function love.update(dt)
     -- Clone decoder and seek to current audio position
-    -- new decoder will have pos=0 which allows seeking to source's exact position
     local d = decoder:clone()
     d:seek(source:tell("seconds"))
-
-    -- get sound data at current pos and compute fft
     soundData = d:decode()
+    -- Compute and benchmark FFT
     local time_start = os.clock()
-    fft_data = FFT.ditfft2(soundData)
+    fft_data = FFT.ditfft2(soundData, window.hann)
     fft_benchmark = os.clock() - time_start
 end
 

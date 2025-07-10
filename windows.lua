@@ -1,3 +1,4 @@
+-- Provides various different window functions for computing fourier transforms
 local window = {}
 local cos = math.cos
 local pi = math.pi
