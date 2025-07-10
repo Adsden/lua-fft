@@ -12,7 +12,7 @@
 ]]
 
 local complex = require "complex"
-local FFT = require "fft2"
+local FFT = require "fft"
 
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
@@ -24,8 +24,8 @@ local decoder ---@type love.Decoder
 local source ---@type love.Source
 function love.load()
     -- create sound decoder and source
-    -- decoder = love.sound.newDecoder("song1.mp3", 4096)
-    decoder = love.sound.newDecoder("song1_mono.wav", 4096 / 2)
+    decoder = love.sound.newDecoder("who.wav", 4096)
+    -- decoder = love.sound.newDecoder("song1_mono.wav", 4096 / 2)
     source = love.audio.newSource(decoder, "stream")
     source:play()
 end
@@ -63,7 +63,7 @@ function love.draw()
         table.insert(points, centre_y - soundData:getSample(i) * 100)
     end
     love.graphics.setColor(0, 0.5, 1)
-    love.graphics.points(points)
+    love.graphics.line(points)
 
     -- frequency domain plot
     points = {}
