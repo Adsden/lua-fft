@@ -49,7 +49,10 @@ local function ditfft2(data, N, s)
     return dft_merged
 end
 
--- wrapper function for love.SoundData
+---Computes the Cooley-Tukey Radix-2 DIT FFT
+---@param soundData love.SoundData
+---@param window windowFunction Window function to be applied. Defaults to a Hann window
+---@return table[] fft A zero-indexed array of complex numbers
 function FFT.ditfft2(soundData, window)
     window = window or windows.hann
     return ditfft2(tolist(soundData, window))
