@@ -1,24 +1,23 @@
---[[
-
-    TODO:
-
-    - Handle L/R channels being interleaved in sound data
-    - Implement FFT rather than the naive DFT
-    - Look into embedding complex number calculations rather than using a
-      complex number module
-    - Experiment with recording device samples (microphone)
-    - Add windowing functions (perhaps a table/module of various functions)
-    - Clean up code
-]]
-
-local complex = require "complex"
-local FFT = require "fft"
-
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
     require("lldebugger").start()
 end
 
+local complex = require "complex"
+local FFT = require "fft"
+
+--[[
+
+    TODO:
+
+    - [ ] Handle L/R channels being interleaved in sound data
+    - [x] Implement FFT rather than the naive DFT
+    - [ ] Look into embedding complex number calculations rather than using a
+          complex number module
+    - [ ] Experiment with recording device samples (microphone)
+    - [ ] Add windowing functions (perhaps a table/module of various functions)
+    - [ ] Clean up code
+]]
 
 local decoder ---@type love.Decoder
 local source ---@type love.Source
