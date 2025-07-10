@@ -51,7 +51,7 @@ end
 
 ---Computes the Cooley-Tukey Radix-2 DIT FFT
 ---@param soundData love.SoundData
----@param window windowFunction Window function to be applied. Defaults to a Hann window
+---@param window? windowFunction Window function to be applied. Defaults to a Hann window
 ---@return table[] fft A zero-indexed array of complex numbers
 function FFT.ditfft2(soundData, window)
     window = window or windows.hann
