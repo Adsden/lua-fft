@@ -1,4 +1,5 @@
 local window = require "windows"
+local renderer = require "renderer"
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
     require("lldebugger").start()
@@ -54,17 +55,11 @@ function love.draw()
     debug("FFT computation time: %f (%06.03f ms)", fft_benchmark, fft_benchmark * 1000)
 
     -- time domain plot
-    local points = {}
-    local centre_y = love.graphics.getHeight() / 2
-    for i = 0, love.graphics.getWidth() do
-        table.insert(points, i)
-        table.insert(points, centre_y - soundData:getSample(i) * 100)
-    end
-    love.graphics.setColor(0, 0.5, 1)
-    love.graphics.line(points)
+    renderer.plot_sounddata(soundData, 100)
 
     -- frequency domain plot
-    points = {}
+    local centre_y = love.graphics.getHeight() / 2
+    local points = {}
     for i = 0, (#fft_data + 1) / 2 do
         -- table.insert(points, math.log10(i) * (1024 / math.log10((#fft_data + 1) / 2)))
         table.insert(points, i * 2)
