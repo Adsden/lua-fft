@@ -1,12 +1,10 @@
 local window = require "windows"
 local renderer = require "renderer"
+local FFT = require "fft"
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
     require("lldebugger").start()
 end
-
-local complex = require "complex"
-local FFT = require "fft"
 
 --[[
 
