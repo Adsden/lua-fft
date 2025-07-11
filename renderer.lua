@@ -2,21 +2,21 @@ local complex = require "complex"
 local renderer = {}
 
 ---@param soundData love.SoundData
-function renderer.plot_sounddata(soundData, amp)
-    local centre_y = love.graphics.getHeight() / 2
+function renderer.plot_sounddata(soundData, amp, baseline)
+    local baseline = baseline or love.graphics.getHeight() / 2
     local dx = love.graphics.getWidth() / soundData:getSampleCount()
 
     local points = {}
     for i = 0, soundData:getSampleCount() - 1 do
         table.insert(points, i * dx)
-        table.insert(points, centre_y - soundData:getSample(i) * (amp or 100))
+        table.insert(points, baseline - soundData:getSample(i) * (amp or 100))
     end
     love.graphics.setColor(0, 0.5, 1)
     love.graphics.line(points)
 end
 
-function renderer.plot_fft(fftData, amp)
-    local centre_y = love.graphics.getHeight() / 2
+function renderer.plot_fft(fftData, amp, baseline)
+    baseline = baseline or love.graphics.getHeight()
     local N = (#fftData + 1) / 2
     local dx = love.graphics.getWidth() / N
 
@@ -25,8 +25,8 @@ function renderer.plot_fft(fftData, amp)
         table.insert(points, i * dx)
         -- calculate magnitude
         local re, im = complex.get(fftData[i])
-        local magnitude = math.sqrt(re ^ 2 + im ^ 2)
-        table.insert(points, centre_y - magnitude)
+        local magnitude = math.sqrt(re ^ 2 + im ^ 2) * (amp or 1)
+        table.insert(points, baseline - magnitude)
     end
 
     love.graphics.setColor(0, 1, 0)
