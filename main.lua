@@ -58,17 +58,7 @@ function love.draw()
     renderer.plot_sounddata(soundData, 100)
 
     -- frequency domain plot
-    local centre_y = love.graphics.getHeight() / 2
-    local points = {}
-    for i = 0, (#fft_data + 1) / 2 do
-        -- table.insert(points, math.log10(i) * (1024 / math.log10((#fft_data + 1) / 2)))
-        table.insert(points, i * 2)
-        local re, im = complex.get(fft_data[i])
-        local magnitude = math.sqrt(re ^ 2 + im ^ 2)
-        table.insert(points, centre_y - magnitude)
-    end
-    love.graphics.setColor(0, 1, 0)
-    love.graphics.line(points)
+    renderer.plot_fft(fft_data)
 end
 
 DEBUG_PRINT_LINE = 0
