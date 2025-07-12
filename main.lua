@@ -68,8 +68,8 @@ function love.draw()
     renderer.plot_fft(ditfft_data, 2, love.graphics.getHeight() - 100)
     
     love.graphics.setColor(1, 0, 0)
-    love.graphics.print("iterfft", 0, love.graphics.getHeight() - 200)
-    renderer.plot_fft(iterfft_data, 2, love.graphics.getHeight() - 200)
+    love.graphics.print("iterfft", 0, love.graphics.getHeight() - 100)
+    renderer.plot_fft(iterfft_data, 2, love.graphics.getHeight() - 100)
 end
 
 DEBUG_PRINT_LINE = 0
