@@ -56,8 +56,6 @@ function FFT.iterfft(soundData, window)
     return iterfft(tolist(soundData, window))
 end
 
-
-
 local function ditfft2(data, N, s)
     N = N or #data + 1
     s = s or 1
@@ -129,4 +127,32 @@ function FFT.naive_dft(x)
     return X, os.clock() - time_start
 end
 
-return FFT
+-- return FFT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- print data
+local function dprint(data)
+    for i = 0, #data do
+        print("  " .. i, data[i])
+    end
+end
+
+-- create data
+local test_data = { "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p" }
+test_data[0] = "a"
+
+print("initial data:")
+dprint(test_data)
