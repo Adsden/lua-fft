@@ -38,7 +38,7 @@ local function iterfft(data)
         for k = 0, n - 1, m do
             local w = 1
             for j = 0, (m / 2) - 1 do
-                local t = w * data[k + j + m / 2]
+                local t = w * A[k + j + m / 2]
                 local u = A[k + j]
                 A[k + j] = u + t
                 A[k + j + m / 2] = u - t
@@ -127,32 +127,4 @@ function FFT.naive_dft(x)
     return X, os.clock() - time_start
 end
 
--- return FFT
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- print data
-local function dprint(data)
-    for i = 0, #data do
-        print("  " .. i, data[i])
-    end
-end
-
--- create data
-local test_data = { "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p" }
-test_data[0] = "a"
-
-print("initial data:")
-dprint(test_data)
+return FFT
