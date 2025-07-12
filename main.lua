@@ -39,7 +39,7 @@ function love.update(dt)
     soundData = d:decode()
     -- Compute and benchmark FFT
     local time_start = os.clock()
-    fft_data = FFT.ditfft2(soundData, window.hann)
+    fft_data = FFT.iterfft(soundData, window.hann)
     fft_benchmark = os.clock() - time_start
 end
 
@@ -56,7 +56,7 @@ function love.draw()
     renderer.plot_sounddata(soundData, 100)
 
     -- frequency domain plot
-    renderer.plot_fft(fft_data, 2)
+    renderer.plot_fft(fft_data, 20, love.graphics.getHeight() - 100)
 end
 
 DEBUG_PRINT_LINE = 0
