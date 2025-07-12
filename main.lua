@@ -30,17 +30,22 @@ function love.load()
 end
 
 local soundData ---@type love.SoundData
-local fft_data
-local fft_benchmark
+local ditfft_data, ditfft_benchmark
+local iterfft_data, iterfft_benchmark
 function love.update(dt)
     -- Clone decoder and seek to current audio position
     local d = decoder:clone()
     d:seek(source:tell("seconds"))
     soundData = d:decode()
+
     -- Compute and benchmark FFT
     local time_start = os.clock()
-    fft_data = FFT.iterfft(soundData, window.hann)
-    fft_benchmark = os.clock() - time_start
+    ditfft_data = FFT.ditfft2(soundData, window.hann)
+    ditfft_benchmark = os.clock() - time_start
+
+    time_start = os.clock()
+    iterfft_data = FFT.iterfft(soundData, window.hann)
+    iterfft_benchmark = os.clock() - time_start
 end
 
 function love.draw()
@@ -50,13 +55,21 @@ function love.draw()
     debug("%d samples @ %dHz", soundData:getSampleCount(), soundData:getSampleRate())
     debug("Window resolution: %d x %d", love.graphics.getDimensions())
     debug("Mouse position: %d x %d", love.mouse.getPosition())
-    debug("FFT computation time: %f (%06.03f ms)", fft_benchmark, fft_benchmark * 1000)
+    debug("FFT computation time (iterfft): %f (%06.03f ms)", iterfft_benchmark, iterfft_benchmark * 1000)
+    debug("FFT computation time (ditfft): %f (%06.03f ms)", ditfft_benchmark, ditfft_benchmark * 1000)
 
     -- time domain plot
+    love.graphics.setColor(0, 0.5, 1)
     renderer.plot_sounddata(soundData, 100)
 
     -- frequency domain plot
-    renderer.plot_fft(fft_data, 20, love.graphics.getHeight() - 100)
+    love.graphics.setColor(0, 1, 0)
+    love.graphics.print("ditfft", 0, love.graphics.getHeight() - 100)
+    renderer.plot_fft(ditfft_data, 2, love.graphics.getHeight() - 100)
+    
+    love.graphics.setColor(1, 0, 0)
+    love.graphics.print("iterfft", 0, love.graphics.getHeight() - 200)
+    renderer.plot_fft(iterfft_data, 2, love.graphics.getHeight() - 200)
 end
 
 DEBUG_PRINT_LINE = 0
