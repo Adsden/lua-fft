@@ -11,7 +11,6 @@ function renderer.plot_sounddata(soundData, amp, baseline)
         table.insert(points, i * dx)
         table.insert(points, baseline - soundData:getSample(i) * (amp or 100))
     end
-    love.graphics.setColor(0, 0.5, 1)
     love.graphics.line(points)
 end
 
@@ -29,7 +28,6 @@ function renderer.plot_fft(fftData, amp, baseline)
         table.insert(points, baseline - magnitude)
     end
 
-    love.graphics.setColor(0, 1, 0)
     love.graphics.line(points)
 end
 
