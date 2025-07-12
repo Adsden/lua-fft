@@ -59,6 +59,12 @@ function love.draw()
     renderer.plot_fft(fft_data, 2)
 end
 
+function love.keypressed(key)
+    if key == "escape" then
+        love.event.quit()
+    end
+end
+
 DEBUG_PRINT_LINE = 0
 -- Handles printing debug messages to screen on a new line.
 -- Uses string.format for more consise debug print statements
