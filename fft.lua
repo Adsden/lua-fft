@@ -50,6 +50,12 @@ local function iterfft(data)
     return A
 end
 
+-- sounddata iterfft wrapper
+function FFT.iterfft(soundData, window)
+    window = window or windows.hann
+    return iterfft(tolist(soundData, window))
+end
+
 
 
 local function ditfft2(data, N, s)
