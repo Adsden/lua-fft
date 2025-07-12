@@ -1,5 +1,6 @@
 local complex = require "complex"
 local windows = require "windows"
+local bitutil = require "bitutil"
 local FFT = {}
 
 ---Converts love.SoundData objects to a 0-indexed lists of complex numbers
@@ -12,6 +13,44 @@ local function tolist(soundData, window)
     end
     return list
 end
+
+-- Permutes the array using bit reversal
+local function bit_reverse_copy(array)
+    -- Calculate number of bits used in numbers
+    local n = math.log(#array + 1, 2)
+
+    local bitrev = {}
+    for i = 0, #array do -- array is zero-indexed
+        bitrev[bitutil.brev(i, n)] = array[i]
+    end
+
+    return bitrev
+end
+
+
+local function iterfft(data)
+    local n = #data + 1
+    local A = bit_reverse_copy(data)
+
+    for s = 1, math.log(n, 2) do
+        local m = 2 ^ s
+        local wm = complex.exp((-2 * math.pi * complex.new(0, 1)) / m)
+        for k = 0, n - 1, m do
+            local w = 1
+            for j = 0, (m / 2) - 1 do
+                local t = w * data[k + j + m / 2]
+                local u = A[k + j]
+                A[k + j] = u + t
+                A[k + j + m / 2] = u - t
+                w = w * wm
+            end
+        end
+    end
+
+    return A
+end
+
+
 
 local function ditfft2(data, N, s)
     N = N or #data + 1
