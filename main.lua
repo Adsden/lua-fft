@@ -1,10 +1,6 @@
 local window = require "windows"
 local renderer = require "renderer"
 local FFT = require "fft"
--- Attach debugger if necessary
-if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
-    require("lldebugger").start()
-end
 
 --[[
 
@@ -19,18 +15,24 @@ end
     - [ ] Clean up code
 ]]
 
+-- Attach debugger if necessary
+if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+  require("lldebugger").start()
+end
+
+
 local decoder ---@type love.Decoder
 local source ---@type love.Source
 function love.load()
     -- create sound decoder and source
-    decoder = love.sound.newDecoder("audio/who.wav", 4096 / 2)
+    decoder = love.sound.newDecoder("audio/who.wav", 4096)
     -- decoder = love.sound.newDecoder("song1_mono.wav", 4096 / 2)
     source = love.audio.newSource(decoder, "stream")
     source:play()
 end
 
 local soundData ---@type love.SoundData
-local ditfft_data, ditfft_benchmark
+-- local ditfft_data, ditfft_benchmark
 local iterfft_data, iterfft_benchmark
 function love.update(dt)
     -- Clone decoder and seek to current audio position
@@ -39,11 +41,11 @@ function love.update(dt)
     soundData = d:decode()
 
     -- Compute and benchmark FFT
-    local time_start = os.clock()
-    ditfft_data = FFT.ditfft2(soundData, window.hann)
-    ditfft_benchmark = os.clock() - time_start
+    -- local time_start = os.clock()
+    -- ditfft_data = FFT.ditfft2(soundData, window.hann)
+    -- ditfft_benchmark = os.clock() - time_start
 
-    time_start = os.clock()
+    local time_start = os.clock()
     iterfft_data = FFT.iterfft(soundData, window.hann)
     iterfft_benchmark = os.clock() - time_start
 end
@@ -56,17 +58,17 @@ function love.draw()
     debug("Window resolution: %d x %d", love.graphics.getDimensions())
     debug("Mouse position: %d x %d", love.mouse.getPosition())
     debug("FFT computation time (iterfft): %f (%06.03f ms)", iterfft_benchmark, iterfft_benchmark * 1000)
-    debug("FFT computation time (ditfft): %f (%06.03f ms)", ditfft_benchmark, ditfft_benchmark * 1000)
+    -- debug("FFT computation time (ditfft): %f (%06.03f ms)", ditfft_benchmark, ditfft_benchmark * 1000)
 
     -- time domain plot
     love.graphics.setColor(0, 0.5, 1)
     renderer.plot_sounddata(soundData, 100)
 
     -- frequency domain plot
-    love.graphics.setColor(0, 1, 0)
-    love.graphics.print("ditfft", 0, love.graphics.getHeight() - 100)
-    renderer.plot_fft(ditfft_data, 2, love.graphics.getHeight() - 100)
-    
+    -- love.graphics.setColor(0, 1, 0)
+    -- love.graphics.print("ditfft", 0, love.graphics.getHeight() - 100)
+    -- renderer.plot_fft(ditfft_data, 2, love.graphics.getHeight() - 100)
+
     love.graphics.setColor(1, 0, 0)
     love.graphics.print("iterfft", 0, love.graphics.getHeight() - 100)
     renderer.plot_fft(iterfft_data, 2, love.graphics.getHeight() - 100)

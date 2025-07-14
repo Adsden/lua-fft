@@ -1,3 +1,8 @@
+-- Attach debugger if necessary
+if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+    require("lldebugger").start()
+end
+
 local complex = require "complex"
 local windows = require "windows"
 local bitutil = require "bitutil"
@@ -9,7 +14,7 @@ local function tolist(soundData, window)
     local list = {}
     local N = soundData:getSampleCount()
     for i = 0, N - 1 do
-        list[i] = complex.to(soundData:getSample(i) * window(i, N))
+        list[i] = complex.to(soundData:getSample(i) * window(i, N)) or { 0, 0 }
     end
     return list
 end
@@ -38,10 +43,10 @@ local function iterfft(data)
         for k = 0, n - 1, m do
             local w = 1
             for j = 0, (m / 2) - 1 do
-                local t = w * A[k + j + m / 2]
+                local t = w * A[k + j + (m / 2)]
                 local u = A[k + j]
                 A[k + j] = u + t
-                A[k + j + m / 2] = u - t
+                A[k + j + (m / 2)] = u - t
                 w = w * wm
             end
         end
