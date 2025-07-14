@@ -1,8 +1,3 @@
--- Attach debugger if necessary
-if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
-    require("lldebugger").start()
-end
-
 local complex = require "complex"
 local windows = require "windows"
 local bitutil = require "bitutil"
