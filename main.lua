@@ -1,3 +1,8 @@
+-- Attach debugger if necessary
+if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+    require("lldebugger").start()
+end
+
 local window = require "windows"
 local renderer = require "renderer"
 local FFT = require "fft"
@@ -14,12 +19,6 @@ local FFT = require "fft"
     - [x] Add windowing functions (perhaps a table/module of various functions)
     - [ ] Clean up code
 ]]
-
--- Attach debugger if necessary
-if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
-  require("lldebugger").start()
-end
-
 
 local decoder ---@type love.Decoder
 local source ---@type love.Source
