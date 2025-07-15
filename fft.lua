@@ -102,6 +102,10 @@ local function ditfft2(data, N, s)
     return dft_merged
 end
 
+local function naive_dft(data)
+    
+end
+
 local FFT = {}
 
 ---Computes the Cooley-Tukey Radix-2 DIT fast fourier transform using an
