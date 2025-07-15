@@ -19,12 +19,12 @@ local function bit_reverse_copy(array)
     -- Calculate number of bits used in numbers
     local n = math.log(#array + 1, 2)
 
-    local bitrev = {}
+    local bit_reversed = {}
     for i = 0, #array do -- array is zero-indexed
-        bitrev[bitutil.brev(i, n)] = array[i]
+        bit_reversed[bitutil.brev(i, n)] = array[i]
     end
 
-    return bitrev
+    return bit_reversed
 end
 
 
