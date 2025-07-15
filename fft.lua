@@ -145,7 +145,8 @@ function FFT.ditfft2(soundData, window)
     return ditfft2(tolist(soundData, window))
 end
 
----Computes the naive DFT. Not a fast fourier transform, and not optimised.
+---Computes the discrete fourier transform using a naive implementation
+---based on its definition. Not a *fast* fourier transform, and not optimised.
 ---[See More](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
 ---@param soundData love.SoundData Sound data.
 ---@param window? WindowFunction Window function to apply to data. Defaults to a Hann window.
