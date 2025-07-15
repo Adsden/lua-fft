@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug LOVE2D",
+      "name": "Debug Love",
       "type": "lua-local",
       "request": "launch",
       "program": {
@@ -11,9 +11,9 @@
       "args": [
         "."
       ],
-      "scriptRoots": [
-        "game"
-      ]
+      // "scriptRoots": [
+      //   "."
+      // ]
     }
   ]
 }
