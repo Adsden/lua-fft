@@ -1,36 +1,46 @@
 local complex = require "complex"
 local windows = require "windows"
 local bitutil = require "bitutil"
-local FFT = {}
 
----Converts love.SoundData objects to a 0-indexed lists of complex numbers
----@param soundData love.SoundData
+---Converts love.SoundData objects to regular 0-indexed arrays/lists.
+---Each sample value is converted to a complex number (with to imaginary part),
+---and a window function is also applied. (Defaults to a Hann window)
+---@param soundData any
+---@param window any
+---@return table
 local function tolist(soundData, window)
+    window = window or windows.hann
     local list = {}
     local N = soundData:getSampleCount()
     for i = 0, N - 1 do
-        list[i] = complex.to(soundData:getSample(i) * window(i, N)) or { 0, 0 }
+        list[i] = complex.to(soundData:getSample(i) * window(i, N))
     end
     return list
 end
 
--- Permutes the array using bit reversal
-local function bit_reverse_copy(array)
+---Permutes an array using bit-reversal.
+---@param array any[] 0-Indexed array
+---@return any[] bitrev_array Permuted 0-indexed array
+local function bit_reverse_array(array)
     -- Calculate number of bits used in numbers
     local n = math.log(#array + 1, 2)
 
-    local bit_reversed = {}
+    local bitrev_array = {}
     for i = 0, #array do -- array is zero-indexed
-        bit_reversed[bitutil.brev(i, n)] = array[i]
+        bitrev_array[bitutil.brev(i, n)] = array[i]
     end
 
-    return bit_reversed
+    return bitrev_array
 end
 
-
+---Computes the Cooley-Tukey Radix-2 DIT fast fourier transform using an
+---iterative, non-recursive implementation based on bit-reversal permutation.
+---[See More](https://en.m.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm#Data_reordering,_bit_reversal,_and_in-place_algorithms)
+---@param data table[] 0-Indexed array of complex numbers representing samples (Time domain)
+---@return table[] 0-Indexed array of complex numbers representing FFT result. (Frequency domain)
 local function iterfft(data)
     local n = #data + 1
-    local A = bit_reverse_copy(data)
+    local A = bit_reverse_array(data)
 
     for s = 1, math.log(n, 2) do
         local m = 2 ^ s
@@ -50,12 +60,12 @@ local function iterfft(data)
     return A
 end
 
--- sounddata iterfft wrapper
-function FFT.iterfft(soundData, window)
-    window = window or windows.hann
-    return iterfft(tolist(soundData, window))
-end
-
+---Computes the Cooley-Tukey Radix-2 DIT fast fourier transform using a recursive implementation.
+---[See More](https://en.m.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm#Pseudocode)
+---@param data table[] 0-Indexed array of 2^k complex numbers representing samples (Time domain)
+---@param N? integer Only used for recursion - should not be set manually! Sample count, must be a power of 2.
+---@param s? integer Only used for recursion - should not be set manually! Input stride.
+---@return table 0-Indexed array of complex numbers representing FFT result. (Frequency domain)
 local function ditfft2(data, N, s)
     N = N or #data + 1
     s = s or 1
@@ -92,22 +102,30 @@ local function ditfft2(data, N, s)
     return dft_merged
 end
 
----Computes the Cooley-Tukey Radix-2 DIT FFT
----@param soundData love.SoundData
----@param window? windowFunction Window function to be applied. Defaults to a Hann window
----@return table[] fft A zero-indexed array of complex numbers
+local FFT = {}
+
+---Computes the Cooley-Tukey Radix-2 DIT fast fourier transform using an
+---iterative, non-recursive implementation based on bit-reversal permutation.
+---@param soundData love.SoundData Sound data. Must contain a power-of-2 amount of samples.
+---@param window? WindowFunction Window function to apply to data. Defaults to a Hann window.
+---@return table[] 0-Indexed array of complex numbers representing FFT result.
+function FFT.iterfft(soundData, window)
+    return iterfft(tolist(soundData, window))
+end
+
+---Computes the Cooley-Tukey Radix-2 DIT fast fourier transform using a recursive implementation
+---@param soundData love.SoundData Sound data. Must contain a power-of-2 amount of samples.
+---@param window? WindowFunction Window function to apply to data. Defaults to a Hann window.
+---@return table[] 0-Indexed array of complex numbers representing FFT result.
 function FFT.ditfft2(soundData, window)
-    window = window or windows.hann
     return ditfft2(tolist(soundData, window))
 end
 
 ---Computes the naive DFT. Not a fast fourier transform, and not optimised:
----[See top of section](https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm#The_radix-2_DIT_case)
+---[See More](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
 ---@param x love.SoundData
 ---@return table[]
----@return number time Computation time (for benchmarking purposes)
 function FFT.naive_dft(x)
-    local time_start = os.clock()
     local X = {} -- X[k] Complex frequency spectrum
     local N = x:getSampleCount()
 
@@ -124,7 +142,7 @@ function FFT.naive_dft(x)
         X[k] = sum
     end
 
-    return X, os.clock() - time_start
+    return X
 end
 
 return FFT

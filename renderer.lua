@@ -16,7 +16,7 @@ end
 
 function renderer.plot_fft(fftData, amp, baseline)
     baseline = baseline or love.graphics.getHeight()
-    local N = (#fftData + 1) / 2
+    local N = (#fftData + 1) / 2 -- Discard second half of FFT
     local dx = love.graphics.getWidth() / N
 
     local points = {}
