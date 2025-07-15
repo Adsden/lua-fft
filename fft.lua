@@ -65,7 +65,7 @@ end
 ---@param data table[] 0-Indexed array of 2^k complex numbers representing samples (Time domain)
 ---@param N? integer Only used for recursion - should not be set manually! Sample count, must be a power of 2.
 ---@param s? integer Only used for recursion - should not be set manually! Input stride.
----@return table 0-Indexed array of complex numbers representing FFT result. (Frequency domain)
+---@return table[] 0-Indexed array of complex numbers representing FFT result. (Frequency domain)
 local function ditfft2(data, N, s)
     N = N or #data + 1
     s = s or 1
@@ -102,8 +102,28 @@ local function ditfft2(data, N, s)
     return dft_merged
 end
 
+---Computes the naive DFT. Not a fast fourier transform, and not optimised.
+---[See More](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
+---@param data table[] 0-Indexed array of complex numbers representing samples (Time domain)
+---@return table[] 0-Indexed array of complex numbers representing FFT result. (Frequency domain)
 local function naive_dft(data)
-    
+    local X = {} -- X[k] Complex frequency spectrum
+    local N = #data + 1
+
+    -- 2pi/N * -i
+    local W = complex.new(0, 1) * ((2 * math.pi) / N)
+
+    -- k: frequency index X[k]
+    for k = 0, N - 1 do
+        local sum = complex.to(0)
+        for n = 0, N - 1 do
+            sum = sum + (data[n] * complex.exp(W * k * n))
+        end
+
+        X[k] = sum
+    end
+
+    return X
 end
 
 local FFT = {}
@@ -125,28 +145,13 @@ function FFT.ditfft2(soundData, window)
     return ditfft2(tolist(soundData, window))
 end
 
----Computes the naive DFT. Not a fast fourier transform, and not optimised:
+---Computes the naive DFT. Not a fast fourier transform, and not optimised.
 ---[See More](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
----@param x love.SoundData
----@return table[]
-function FFT.naive_dft(x)
-    local X = {} -- X[k] Complex frequency spectrum
-    local N = x:getSampleCount()
-
-    -- 2pi/N * -i
-    local W = complex.new(0, -1) * ((2 * math.pi) / N)
-
-    -- k: frequency index X[k]
-    for k = 0, N - 1 do
-        local sum = complex.to(0)
-        for n = 0, N - 1 do
-            sum = sum + (x:getSample(n) * complex.exp(W * k * n))
-        end
-
-        X[k] = sum
-    end
-
-    return X
+---@param soundData love.SoundData Sound data.
+---@param window? WindowFunction Window function to apply to data. Defaults to a Hann window.
+---@return table[] 0-Indexed array of complex numbers representing FFT result.
+function FFT.naive_dft(soundData, window)
+    return naive_dft(tolist(soundData, window))
 end
 
 return FFT
