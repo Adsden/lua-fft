@@ -27,7 +27,7 @@ local decoder ---@type love.Decoder
 local source ---@type love.Source
 function love.load()
     -- create sound decoder and audio source
-    decoder = love.sound.newDecoder("audio/who.wav", 4096)
+    decoder = love.sound.newDecoder("audio/who.mp3", 4096)
     source = love.audio.newSource(decoder, "stream")
     source:play()
 end
