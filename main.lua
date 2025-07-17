@@ -1,3 +1,4 @@
+local sdutil = require "sdutil"
 -- Attach debugger if necessary
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
     require("lldebugger").start()
@@ -42,7 +43,7 @@ function love.update(dt)
 
     -- Compute and benchmark FFT
     local time_start = os.clock()
-    fft_data = FFT.iterfft(soundData, window.hann)
+    fft_data = FFT.iterfft(sdutil.tolist(soundData, "mono", window.hann))
     fft_benchmark = os.clock() - time_start
 end
 
