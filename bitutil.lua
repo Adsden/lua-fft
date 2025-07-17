@@ -4,9 +4,9 @@ local bitutil = {}
 -- https://graphics.stanford.edu/~seander/bithacks.html#SwappingBitsXOR
 function bitutil.bswap(b, i, j, n)
     n = n or 1
-    -- local x = ((b >> i) ^ (b >> j)) & ((1U << n) - 1) // XOR temporary
+    -- local x = ((b >> i) ~ (b >> j)) & ((1 << n) - 1) -- XOR temporary
     local x = bit.band(bit.bxor(bit.rshift(b, i), bit.rshift(b, j)), (bit.lshift(1, n) - 1))
-    -- local r = b ^ ((x << i) | (x << j));
+    -- local r = b ~ ((x << i) | (x << j))
     return bit.bxor(b, bit.bor(bit.lshift(x, i), bit.lshift(x, j)))
 end
 
