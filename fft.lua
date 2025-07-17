@@ -5,15 +5,24 @@ local bitutil = require "bitutil"
 ---Converts love.SoundData objects to regular 0-indexed arrays/lists.
 ---Each sample value is converted to a complex number (with to imaginary part),
 ---and a window function is also applied. (Defaults to a Hann window)
----@param soundData any
----@param window any
----@return table
-local function tolist(soundData, window)
+---@param soundData love.SoundData
+---@param window WindowFunction
+---@param channel integer Audio channel. 0 to mix to mono, nil/default to leave samples interleaved/use defult.
+---@return table[]
+local function tolist(soundData, window, channel)
     window = window or windows.hann
-    local list = {}
     local N = soundData:getSampleCount()
-    for i = 0, N - 1 do
-        list[i] = complex.to(soundData:getSample(i) * window(i, N))
+
+    local list = {}
+    if channel == 0 or channel == "mono" then
+        for i = 0, N - 1 do
+            local avgSample = (soundData:getSample(i, 1) + soundData:getSample(i, 2)) / 2
+            list[i] = complex.to(avgSample * window(i, N))
+        end
+    else
+        for i = 0, N - 1 do
+            list[i] = complex.to(soundData:getSample(i, channel) * window(i, N))
+        end
     end
     return list
 end
