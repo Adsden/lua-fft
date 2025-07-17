@@ -12,21 +12,28 @@ local sdutil = {}
 ---@return table[]
 function sdutil.tolist(soundData, channel, window)
     window = window or windows.hann
-    if channel == "mono" then channel = 0 end
     if channel == "left" then channel = 1 end
     if channel == "right" then channel = 2 end
-    local N = soundData:getSampleCount()
 
     local list = {}
-    if channel == 0 then -- Mix stereo down to mono
+    if channel == "mono" or channel == 0 then
+        -- Mix stereo down to mono
+        local N = soundData:getSampleCount()
         for i = 0, N - 1 do
             local avgSample = (soundData:getSample(i, 1) + soundData:getSample(i, 2)) / 2
             list[i] = complex.to(avgSample * window(i, N))
         end
-    else -- Use selected channel (or nil for default behaviour of getSample)
+    elseif type(channel) == "number" then
+        -- Use specific channel
+        local N = soundData:getSampleCount()
         for i = 0, N - 1 do
-            ---@diagnostic disable-next-line: param-type-mismatch
             list[i] = complex.to(soundData:getSample(i, channel) * window(i, N))
+        end
+    else
+        -- Leave data as-is (interleaved samples)
+        local N = soundData:getSampleCount() * soundData:getChannelCount()
+        for i = 0, N - 1 do
+            list[i] = complex.to(soundData:getSample(i) * window(i, N))
         end
     end
 

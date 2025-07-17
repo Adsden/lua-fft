@@ -43,7 +43,7 @@ function love.update(dt)
 
     -- Compute and benchmark FFT
     local time_start = os.clock()
-    fft_data = FFT.iterfft(sdutil.tolist(soundData, "mono", window.hann))
+    fft_data = FFT.iterfft(sdutil.tolist(soundData, "mono"))
     fft_benchmark = os.clock() - time_start
 end
 
@@ -52,6 +52,7 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
     DEBUG_PRINT_LINE = 0
     debug("SoundData: %d samples @ %dHz", soundData:getSampleCount(), soundData:getSampleRate())
+    debug("FFT: %d samples", #fft_data + 1)
     debug("Window resolution: %d x %d", love.graphics.getDimensions())
     debug("Mouse position: %d x %d", love.mouse.getPosition())
     debug("FFT computation time (iterfft): %f (%06.03f ms)", fft_benchmark, (fft_benchmark * 1000))
