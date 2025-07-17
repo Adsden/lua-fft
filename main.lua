@@ -12,13 +12,10 @@ local FFT = require "fft"
 
     TODO:
 
-    - [ ] Handle L/R channels being interleaved in sound data
+    - [x] Handle L/R channels being interleaved in sound data
     - [x] Implement FFT rather than the naive DFT
-    - [ ] Look into embedding complex number calculations rather than using a
-          complex number module
-    - [ ] Experiment with recording device samples (microphone)
+    - [ ] Experiment with samples from recording devices (RecordingDevice:getData)
     - [x] Add windowing functions (perhaps a table/module of various functions)
-    - [ ] Clean up code
 
     Known Issues:
     - Iterfft seems to duplicate output when going above 2048 samples
